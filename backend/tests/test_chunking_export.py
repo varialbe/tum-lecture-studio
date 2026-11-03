@@ -119,3 +119,19 @@ def test_wer_cer():
     assert wer("a b c d", "a x c") == 0.5  # one substitution + one deletion
     assert cer("abc", "abd") == 1 / 3
     assert wer("", "") == 0.0
+
+
+def test_split_long_segments_at_sentences_and_limits():
+    from lecture_studio.stt.chunking import split_long_segments
+
+    text = "Gibt es Fragen? Sonst gehe ich weiter zum nächsten Kapitel über Vektoren und Matrizen im R hoch n"
+    words = _words(2.0, text, step=1.0)  # one word per second -> 19 s segment
+    seg = Segment(words[0].start, words[-1].end, text, words)
+    parts = split_long_segments([seg], max_seconds=8.0)
+    assert len(parts) > 2
+    assert parts[0].text == "Gibt es Fragen?"  # split at the sentence end
+    assert all(p.end - p.start <= 8.0 for p in parts)
+    assert " ".join(p.text for p in parts) == text  # nothing lost or duplicated
+    assert parts[0].start == 2.0 and parts[-1].end == words[-1].end
+    short = Segment(0, 3, "Kurz.", _words(0, "Kurz."))
+    assert split_long_segments([short]) == [short]

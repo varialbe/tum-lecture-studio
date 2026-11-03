@@ -47,7 +47,9 @@ class MemorySampler:
 
     def _proc_gpu_mb(self) -> float:
         total = 0.0
-        for line in _smi("--query-compute-apps=pid,used_memory", "--format=csv,noheader,nounits").splitlines():
+        for line in _smi(
+            "--query-compute-apps=pid,used_memory", "--format=csv,noheader,nounits"
+        ).splitlines():
             parts = [x.strip() for x in line.split(",")]
             if len(parts) == 2 and parts[0].isdigit() and int(parts[0]) == os.getpid():
                 try:

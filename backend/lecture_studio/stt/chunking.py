@@ -127,7 +127,40 @@ def merge_chunks(chunk_results: list[tuple[Chunk, list[Segment]]]) -> list[Segme
         absolute = [s.shifted(chunk.audio_start) for s in segs]
         merged.extend(own_segments(chunk, absolute, is_last=i == n - 1))
     merged.sort(key=lambda s: (s.start, s.end))
-    return drop_repetitions(merged)
+    return split_long_segments(drop_repetitions(merged))
+
+
+_SENTENCE_END = (".", "?", "!", ":", ";")
+
+
+def split_long_segments(
+    segments: list[Segment], max_seconds: float = 8.0, max_chars: int = 120
+) -> list[Segment]:
+    """Split segments that are too long for subtitles, using word timestamps.
+
+    VAD-merged Whisper segments can exceed 50 s. Each piece ends at a sentence
+    boundary when one is available after at least a third of the limit, otherwise at the
+    last word that still fits. Segments without word timings are kept as they are.
+    """
+    out: list[Segment] = []
+    for seg in segments:
+        if not seg.words or (seg.end - seg.start <= max_seconds and len(seg.text) <= max_chars):
+            out.append(seg)
+            continue
+        cur: list[Word] = []
+        for w in seg.words:
+            if cur:
+                too_long = w.end - cur[0].start > max_seconds or len(_join_words([*cur, w])) > max_chars
+                sentence_break = cur[-1].word.rstrip().endswith(_SENTENCE_END) and (
+                    w.end - cur[0].start > max_seconds / 3
+                )
+                if too_long or sentence_break:
+                    out.append(Segment(cur[0].start, cur[-1].end, _join_words(cur), cur))
+                    cur = []
+            cur.append(w)
+        if cur:
+            out.append(Segment(cur[0].start, cur[-1].end, _join_words(cur), cur))
+    return out
 
 
 def drop_repetitions(segments: list[Segment], max_repeats: int = 2) -> list[Segment]:

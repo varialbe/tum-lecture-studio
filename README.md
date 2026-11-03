@@ -213,7 +213,9 @@ All settings are listed in [.env.example](.env.example).
 
 ## Known limitations
 
-* Lectures whose lecturer disabled downloads can only be streamed on TUM-Live. This is deliberate.
+* Lectures whose lecturer disabled downloads can only be streamed on TUM-Live. This is deliberate. In
+  WiSe 2026/27 that covers all three priority courses (IN0015, IN0004, EIDIP); only 3 of the 69 courses
+  visible to the test account offer downloads.
 * Signing in with a passkey alone isn't possible inside the app. Use *Use browser session*.
 * The SSO replay depends on TUM's login pages, and only mocked flows are tested (see below).
 * Cancelling a transcription stops the job at once, but the current chunk (up to 10 minutes of audio)
@@ -223,8 +225,11 @@ All settings are listed in [.env.example](.env.example).
 
 ## Verification status
 
-See [docs/verification.md](docs/verification.md) for exactly what was run, on which machine, and what was not
-tested.
+In short: a real TUM SSO login, live course discovery (69 courses incl. all three priority courses), a GUI
+end-to-end run (download with crash/resume → GPU transcription of a 115-minute lecture in 131 s → export), and
+the CPU Docker image built and run end-to-end on Linux. Not verified: macOS/MLX, the CUDA and arm64 Docker
+images, and a real MFA prompt. See [docs/verification.md](docs/verification.md) for exactly what was run, on
+which machine, and what was not tested.
 
 ## Development
 
