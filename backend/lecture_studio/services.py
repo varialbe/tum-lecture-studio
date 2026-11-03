@@ -253,12 +253,16 @@ class SttService:
         if not self.models.installed(spec):
             report(f"Downloading model {spec.label} (~{spec.download_gb} GB)", None)
             task = asyncio.create_task(asyncio.to_thread(self.models.download, spec))
-            while not task.done():
+            # The download may already be running (started from the Models page): wait for that one too.
+            while not task.done() or (self.models.download_state(spec.id) or {}).get("status") == "running":
                 st = self.models.download_state(spec.id) or {}
                 if st.get("bytes_total"):
                     report(f"Downloading model {spec.label}", st["bytes_done"] / st["bytes_total"])
                 await asyncio.sleep(1)
             await task
+            if not self.models.installed(spec):
+                err = (self.models.download_state(spec.id) or {}).get("error", "unknown error")
+                raise SttUnavailable(f"Model download failed: {err}")
         path = self.models.local_path(spec)
         assert path
         if spec.engine == "mlx-whisper":

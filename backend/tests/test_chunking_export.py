@@ -110,3 +110,12 @@ def test_other_exports():
 
     j = json.loads(export("json", SEGS, {"title": "x"}))
     assert j["segments"][1] == {"start": 3661.5, "end": 3662.0, "text": "Ende"}
+
+
+def test_wer_cer():
+    from lecture_studio.stt.wer import cer, wer
+
+    assert wer("Die Bijektion ist injektiv.", "die bijektion ist injektiv") == 0.0
+    assert wer("a b c d", "a x c") == 0.5  # one substitution + one deletion
+    assert cer("abc", "abd") == 1 / 3
+    assert wer("", "") == 0.0

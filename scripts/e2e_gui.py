@@ -30,8 +30,13 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 
 def jobs() -> list[dict]:
-    with urllib.request.urlopen(f"{args.base}/api/jobs") as r:
-        return json.load(r)["jobs"]
+    for _ in range(60):  # tolerate a backend restart while waiting
+        try:
+            with urllib.request.urlopen(f"{args.base}/api/jobs") as r:
+                return json.load(r)["jobs"]
+        except OSError:
+            time.sleep(2)
+    raise SystemExit("backend unreachable")
 
 
 def wait_job(kind: str, title_part: str, page, shot: str) -> dict:
@@ -73,9 +78,11 @@ with sync_playwright() as p:
     expect(row).to_be_visible(timeout=60_000)
     page.screenshot(path=str(OUT / "recordings.png"))
 
-    # 4-5: download
-    row.get_by_role("button", name=re.compile("Download|Retry")).click()
-    expect(page.get_by_text(re.compile("queued|already"))).to_be_visible(timeout=15_000)
+    # 4-5: download (skipped if this lecture is already on disk or in the queue)
+    btn = row.get_by_role("button", name=re.compile("^(Download|Retry)$"))
+    if btn.count():
+        btn.click()
+        expect(page.get_by_text(re.compile("queued|already"))).to_be_visible(timeout=15_000)
     dl = wait_job("download", args.lecture, page, "queue-downloading")
     assert dl["status"] == "completed", dl
     path = Path(dl["output_path"])
@@ -83,12 +90,12 @@ with sync_playwright() as p:
     assert path.stat().st_size == dl["bytes_total"]
 
     # 6-8: transcribe from the GUI
-    page.go_back() if False else None
-    page.goto(page.url)  # reload course page
     page.goto(f"{args.base}/courses")
     page.get_by_role("link", name=re.compile(re.escape(args.course))).first.click()
     row = page.locator("tr", has_text=args.lecture).first
-    row.get_by_role("button", name="Transcribe").click()
+    tbtn = row.get_by_role("button", name="Transcribe")
+    if tbtn.count():
+        tbtn.click()
     tx = wait_job("transcribe", args.lecture, page, "queue-transcribing")
     assert tx["status"] == "completed", tx
     print("transcription:", tx["message"])
