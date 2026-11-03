@@ -96,15 +96,17 @@ docker compose --profile gpu up -d --build studio-gpu     # NVIDIA image (Linux,
 
 The container publishes the port on `127.0.0.1` only, and all data lives in `./data` (see [Storage](#storage)).
 
-**Prebuilt image.** CI publishes `ghcr.io/varialbe/tum-lecture-studio:latest` (amd64 + arm64) and `:cuda` on
-every push to `main`. The repository is private, so the package is too: grant the other person read access to
-the package on GitHub, or let them log in with a token that has `read:packages`.
+**Prebuilt image (no build, no login).** CI publishes `ghcr.io/varialbe/tum-lecture-studio:latest`
+(amd64 + arm64, so Apple Silicon too) and `:cuda` on every push to `main`. All you need is Docker:
 
 ```bash
-docker login ghcr.io                     # GitHub username + token with read:packages
-echo "TLS_IMAGE=ghcr.io/varialbe/tum-lecture-studio:latest" >> .env
-docker compose pull studio && docker compose up -d studio
+docker run -d --name tum-lecture-studio --restart unless-stopped   -p 127.0.0.1:8420:8420 -v ~/tum-lecture-studio-data:/data   ghcr.io/varialbe/tum-lecture-studio:latest
 ```
+
+Then open http://localhost:8420 and install it as an app (below). Update with
+`docker pull ghcr.io/varialbe/tum-lecture-studio:latest`, then remove the container and run the same command
+again. Your data stays in `~/tum-lecture-studio-data`. On a Mac the container has no access to the Apple GPU,
+so transcription runs on the CPU; the native setup (`scripts/start.sh`) uses Metal and is much faster.
 
 ### Install it as an app
 
