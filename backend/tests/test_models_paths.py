@@ -104,3 +104,13 @@ def test_recording_path_layout(tmp_path):
     )
     assert p == tmp_path / "2026-WiSe" / "Diskrete Strukturen" / "2026-10-08 Induktion_ Teil 1 [COMB] #42.mp4"
     assert isinstance(p, Path)
+
+
+def test_untitled_recording_gets_date_title(course_json):
+    c = Course.from_api(course_json["course"])
+    r = c.recordings[0]
+    assert r.title == r.name
+    r.name = ""
+    assert r.title == "Vorlesung vom 08.10.2026" and r.to_public()["title"] == r.title
+    r.start = None
+    assert r.title == f"Vorlesung #{r.id}"

@@ -6,7 +6,7 @@ import { api, type Job } from "../lib/api";
 import { useStore } from "../lib/store";
 import { Badge, Button, Empty, PageHeader } from "../components/ui";
 import { STAGE_LABEL, StageRail } from "../components/StageRail";
-import { ago, bytes, duration, speed, VARIANT_LABEL } from "../lib/format";
+import { ago, bytes, duration, lectureTitle, speed, VARIANT_LABEL } from "../lib/format";
 
 type Tab = "active" | "done" | "failed";
 
@@ -105,7 +105,7 @@ export function JobRow({ job: j, onCancel, onRetry, onRemove }: { job: Job; onCa
         <Icon className={clsx("mt-0.5 size-4 shrink-0", running ? "text-accent" : "text-muted")} aria-hidden />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2">
-            <span className="truncate font-medium">{j.title || "Untitled"}</span>
+            <span className="truncate font-medium">{lectureTitle(j)}</span>
             <span className="truncate text-[13px] text-muted">
               {j.course_name} · {VARIANT_LABEL[j.variant ?? ""] ?? j.variant}
             </span>

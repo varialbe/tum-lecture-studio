@@ -48,6 +48,8 @@ export interface Recording {
   id: number;
   course_id: number;
   name: string;
+  /** display name (falls back to the date when TUM-Live has none) */
+  title: string;
   description: string;
   start: string | null;
   end: string | null;

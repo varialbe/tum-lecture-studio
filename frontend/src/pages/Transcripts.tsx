@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FileText, Search } from "lucide-react";
 import { api, type TranscriptSummary } from "../lib/api";
 import { useStore } from "../lib/store";
 import { Empty, Input, PageHeader, Skeleton } from "../components/ui";
-import { ago, clock, duration } from "../lib/format";
+import { ago, clock, duration, lectureTitle } from "../lib/format";
 
 interface Hit {
   transcript_id: string;
@@ -23,6 +23,7 @@ export function safeSnippet(s: string): string {
 
 export default function Transcripts() {
   const { libraryVersion } = useStore();
+  const navigate = useNavigate();
   const [items, setItems] = useState<TranscriptSummary[] | null>(null);
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Hit[] | null>(null);
@@ -59,7 +60,7 @@ export default function Transcripts() {
                   <span className="min-w-0 flex-1">
                     <span className="block" dangerouslySetInnerHTML={{ __html: safeSnippet(h.snippet) }} />
                     <span className="block truncate text-[13px] text-muted">
-                      {h.title} · {h.course_name}
+                      {lectureTitle({ title: h.title, id: h.transcript_id })} · {h.course_name}
                     </span>
                   </span>
                 </Link>
@@ -89,10 +90,10 @@ export default function Transcripts() {
             </thead>
             <tbody>
               {items.map((t) => (
-                <tr key={t.id} className="border-t border-line hover:bg-board-2">
+                <tr key={t.id} onClick={() => navigate(`/transcripts/${t.id}`)} className="cursor-pointer border-t border-line hover:bg-board-2">
                   <td className="px-4 py-2.5">
-                    <Link to={`/transcripts/${t.id}`} className="font-medium hover:text-accent">
-                      {t.title}
+                    <Link to={`/transcripts/${t.id}`} onClick={(e) => e.stopPropagation()} className="font-medium hover:text-accent">
+                      {lectureTitle(t)}
                     </Link>
                     <div className="text-[13px] text-muted">{t.course_name}</div>
                   </td>

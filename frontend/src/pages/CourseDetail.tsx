@@ -255,8 +255,8 @@ function RecordingRow({
         <input type="checkbox" checked={checked} disabled={!can} onChange={onCheck} aria-label={`Select ${r.name}`} />
       </td>
       <td className="max-w-[340px] px-3 py-2.5">
-        <div className="truncate font-medium" title={r.name}>
-          {r.name || "Untitled lecture"}
+        <div className="truncate font-medium" title={r.title}>
+          {r.title || r.name || "Untitled lecture"}
         </div>
       </td>
       <td className="px-3 py-2.5 whitespace-nowrap text-chalk-2">

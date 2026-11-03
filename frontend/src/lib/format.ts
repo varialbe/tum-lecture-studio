@@ -58,3 +58,8 @@ export const VARIANT_LABEL: Record<string, string> = {
   CAM: "Camera",
   FILE: "File",
 };
+
+/** Some lectures have no name on TUM-Live: never render an empty (unclickable) title. */
+export function lectureTitle(x: { title?: string | null; name?: string | null; stream_id?: number; id?: number | string }): string {
+  return (x.title || x.name || "").trim() || `Vorlesung #${x.stream_id ?? x.id ?? "?"}`;
+}

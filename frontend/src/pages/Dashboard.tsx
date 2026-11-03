@@ -5,7 +5,7 @@ import { api, type TranscriptSummary } from "../lib/api";
 import { useStore } from "../lib/store";
 import { Button, PageHeader } from "../components/ui";
 import { JobRow } from "./Queue";
-import { ago, bytes, duration } from "../lib/format";
+import { ago, bytes, duration, lectureTitle } from "../lib/format";
 
 interface LibRec {
   stream_id: number;
@@ -94,7 +94,7 @@ export default function Dashboard() {
               {transcripts.slice(0, 6).map((t) => (
                 <li key={t.id}>
                   <Link to={`/transcripts/${t.id}`} className="flex items-baseline gap-3 px-4 py-2.5 hover:bg-board-2">
-                    <span className="min-w-0 flex-1 truncate">{t.title}</span>
+                    <span className="min-w-0 flex-1 truncate">{lectureTitle(t)}</span>
                     <span className="tnum shrink-0 text-[13px] text-muted">{duration(t.audio_seconds)}</span>
                   </Link>
                 </li>

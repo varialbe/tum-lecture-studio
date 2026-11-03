@@ -5,7 +5,7 @@ import { ArrowLeft, Captions, Check, Copy, Download, FileText, MonitorPlay, Penc
 import { api, type Transcript } from "../lib/api";
 import { useStore } from "../lib/store";
 import { Badge, Button, ErrorBox, Input, Skeleton } from "../components/ui";
-import { clock, duration } from "../lib/format";
+import { clock, duration, lectureTitle } from "../lib/format";
 
 const FORMATS = ["txt", "md", "srt", "vtt", "json"] as const;
 type Mode = "video" | "script";
@@ -231,7 +231,7 @@ export default function TranscriptView() {
       </Link>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-[22px] font-semibold tracking-[-0.01em]">{t.title}</h1>
+          <h1 className="text-[22px] font-semibold tracking-[-0.01em]">{lectureTitle(t)}</h1>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-muted">
             <span>{t.course_name}</span>
             <Badge>{t.model}</Badge>

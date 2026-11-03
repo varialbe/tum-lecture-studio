@@ -89,11 +89,20 @@ class Recording:
         except ValueError:
             return None
 
+    @property
+    def title(self) -> str:
+        """Display name. Some lectures have no name on TUM-Live; fall back to the date."""
+        if self.name:
+            return self.name
+        d = self.date()
+        return f"Vorlesung vom {d:%d.%m.%Y}" if d else f"Vorlesung #{self.id}"
+
     def to_public(self) -> dict[str, Any]:
         """Serialisable view for the GUI - never includes signed URLs."""
         d = asdict(self)
         d.pop("playlists")
         d.pop("downloads")
+        d["title"] = self.title
         d["variants"] = self.available_variants
         d["downloadable_variants"] = self.downloadable_variants
         d["is_vod"] = self.is_vod

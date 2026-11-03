@@ -147,7 +147,7 @@ class JobManager:
             course_name=course["name"],
             year=course["year"],
             term=course["term"],
-            title=recording["name"],
+            title=recording.get("title") or recording["name"] or f"Vorlesung #{sid}",
             variant=variant,
             params={
                 "course_id": course.get("id"),
@@ -340,7 +340,7 @@ class JobManager:
             course_slug=job["course_slug"],
             stream_id=rec.id,
             date=rec.start,
-            title=rec.name,
+            title=rec.title,
             variant=job["variant"],
         )
         part = dest.with_name(dest.name + ".part")
@@ -429,7 +429,7 @@ class JobManager:
             course_name=job["course_name"],
             year=sem.year,
             term=sem.term,
-            title=rec.name,
+            title=rec.title,
             start=rec.start,
             duration=info.duration,
             path=str(dest),
@@ -455,7 +455,7 @@ class JobManager:
                 stream_id=rec.id,
                 variant=job["variant"],
                 media_path=str(dest),
-                title=rec.name,
+                title=rec.title,
                 course_name=job["course_name"],
                 year=sem.year,
                 term=sem.term,
