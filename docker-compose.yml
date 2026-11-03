@@ -1,0 +1,47 @@
+# TUM Lecture Studio
+#   CPU (any OS, incl. macOS - Metal needs the native companion, see README):
+#     docker compose up -d
+#   NVIDIA GPU (Linux / Windows+WSL2 with NVIDIA Container Toolkit):
+#     docker compose --profile gpu up -d studio-gpu   (name the service, so the CPU one stays off)
+# Open http://localhost:8420 - published on 127.0.0.1 only.
+
+x-studio: &studio
+  restart: unless-stopped
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    TLS_DATA_DIR: /data
+    TLS_RECORDINGS_DIR: /data/recordings
+    TLS_TRANSCRIPTS_DIR: /data/transcripts
+    TLS_MODELS_DIR: /data/models
+  volumes:
+    - ${TLS_HOST_DATA_DIR:-./data}:/data
+  ports:
+    - "127.0.0.1:${TLS_PORT:-8420}:8420"
+  extra_hosts:
+    # lets the container reach a host-native STT companion (macOS Metal) on Linux too
+    - "host.docker.internal:host-gateway"
+
+services:
+  studio:
+    <<: *studio
+    image: tum-lecture-studio:latest
+    build:
+      context: .
+      target: cpu
+
+  studio-gpu:
+    <<: *studio
+    image: tum-lecture-studio:cuda
+    build:
+      context: .
+      target: cuda
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

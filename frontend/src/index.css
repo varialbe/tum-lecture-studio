@@ -1,0 +1,146 @@
+@import "tailwindcss";
+@import "@fontsource/schibsted-grotesk/400.css";
+@import "@fontsource/schibsted-grotesk/500.css";
+@import "@fontsource/schibsted-grotesk/600.css";
+@import "@fontsource/schibsted-grotesk/700.css";
+
+/* Chalkboard palette. Dark is the default; light ("paper") is opt-in. */
+:root {
+  --board: #18211e;
+  --board-2: #1f2b27;
+  --board-3: #26342f;
+  --line: #2e3d38;
+  --line-strong: #41544d;
+  --chalk: #e8ece4;
+  --chalk-2: #c3cdc6;
+  --muted: #94a39b;
+  --accent: #e2c767;
+  --accent-ink: #1d1a0e;
+  --info: #6aa2da;
+  --ok: #8cc79a;
+  --warn: #e7a85c;
+  --bad: #ec8478;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --board: #f2f3ee;
+  --board-2: #ffffff;
+  --board-3: #e8ebe4;
+  --line: #d7dcd3;
+  --line-strong: #b8c0b5;
+  --chalk: #1b2421;
+  --chalk-2: #34413c;
+  --muted: #64716b;
+  --accent: #9a7b12;
+  --accent-ink: #ffffff;
+  --info: #2a64a8;
+  --ok: #2f7d45;
+  --warn: #a15e12;
+  --bad: #b23b2e;
+  color-scheme: light;
+}
+
+@theme {
+  --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --color-board: var(--board);
+  --color-board-2: var(--board-2);
+  --color-board-3: var(--board-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-chalk: var(--chalk);
+  --color-chalk-2: var(--chalk-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-info: var(--info);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  background: var(--board);
+  color: var(--chalk);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+mark {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+}
+/* Scrollbars that belong to the board */
+* {
+  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-width: thin;
+}
+
+/* Skeleton shimmer (respecting reduced motion) */
+.skeleton {
+  background: linear-gradient(90deg, var(--board-2) 0%, var(--board-3) 50%, var(--board-2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+/* Indeterminate progress: a chalk stroke sweeping across */
+.indeterminate {
+  position: relative;
+  overflow: hidden;
+}
+.indeterminate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 35%;
+  background: var(--accent);
+  opacity: 0.8;
+  border-radius: inherit;
+  animation: sweep 1.3s ease-in-out infinite;
+}
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .indeterminate::after {
+    animation: none;
+  }
+  .indeterminate::after {
+    width: 100%;
+    opacity: 0.35;
+  }
+}

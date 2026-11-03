@@ -88,6 +88,14 @@ def detect() -> Hardware:
             )
         except (OSError, subprocess.SubprocessError):
             pass
+    elif system == "Windows":
+        try:
+            import winreg
+
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"HARDWARE\DESCRIPTION\System\CentralProcessor\0")
+            cpu = str(winreg.QueryValueEx(key, "ProcessorNameString")[0]).strip() or cpu
+        except OSError:
+            pass
     elif system == "Linux":
         try:
             for line in Path("/proc/cpuinfo").read_text().splitlines():

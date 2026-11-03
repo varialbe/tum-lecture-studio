@@ -1,0 +1,10 @@
+.git
+**/node_modules
+**/.venv
+**/__pycache__
+data
+frontend/dist
+backend/lecture_studio/static
+.env
+.env.*
+docs/screenshots
