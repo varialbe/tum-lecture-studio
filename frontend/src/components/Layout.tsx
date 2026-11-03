@@ -5,6 +5,7 @@ import { AppWindow, BookOpen, Cpu, Download, FileText, LayoutDashboard, LogIn, M
 import { api } from "../lib/api";
 import { useStore } from "../lib/store";
 import { Select } from "./ui";
+import { StreamCaptureSwitch } from "./StreamCaptureSwitch";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -173,7 +174,12 @@ export function Layout() {
               ))}
             </Select>
           </label>
-          <div className="text-sm">{session ? sessionChip : null}</div>
+          <div className="flex items-center gap-5 text-sm">
+            <span className="max-sm:hidden">
+              <StreamCaptureSwitch />
+            </span>
+            {session ? sessionChip : null}
+          </div>
         </header>
         <main className="min-h-0 flex-1 overflow-y-auto px-6 py-6 max-md:px-4">
           <div className="mx-auto max-w-[1280px]">

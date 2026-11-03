@@ -6,6 +6,7 @@ import { api, type CourseSummary, type Job, type Recording } from "../lib/api";
 import { useStore } from "../lib/store";
 import { Badge, Button, Empty, ErrorBox, PageHeader, ProgressBar, Select, Skeleton } from "../components/ui";
 import { STAGE_LABEL } from "../components/StageRail";
+import { StreamCaptureSwitch } from "../components/StreamCaptureSwitch";
 import { bytes, date, duration, time, VARIANT_LABEL } from "../lib/format";
 
 interface Detail {
@@ -121,10 +122,11 @@ export default function CourseDetail() {
             {c.priority && <Badge tone="accent">{c.priority}</Badge>}
             {c.downloads_enabled ? (
               <Badge tone="info">Downloads enabled</Badge>
-            ) : capture ? (
-              <Badge tone="warn">Stream recording</Badge>
             ) : (
-              <Badge>Downloads disabled by the lecturer</Badge>
+              <>
+                <Badge>Downloads disabled by the lecturer</Badge>
+                <StreamCaptureSwitch label="Record streams instead" />
+              </>
             )}
           </span>
         }
@@ -266,8 +268,12 @@ function RecordingRow({
       <td className="px-3 py-2.5">
         <div className="flex gap-1">
           {r.variants.map((v) => (
-            <Badge key={v} tone={r.downloadable_variants.includes(v) ? "neutral" : undefined} title={r.downloadable_variants.includes(v) ? "Downloadable" : "Stream only"}>
-              <span className={r.downloadable_variants.includes(v) ? "" : "opacity-50 line-through"}>{v}</span>
+            <Badge
+              key={v}
+              tone={r.downloadable_variants.includes(v) ? "neutral" : capture ? "warn" : undefined}
+              title={r.downloadable_variants.includes(v) ? "Downloadable" : capture ? "Recorded from the stream" : "Stream only"}
+            >
+              <span className={r.downloadable_variants.includes(v) || capture ? "" : "opacity-50 line-through"}>{v}</span>
             </Badge>
           ))}
         </div>

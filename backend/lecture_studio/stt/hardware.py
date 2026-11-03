@@ -88,7 +88,7 @@ def detect() -> Hardware:
             )
         except (OSError, subprocess.SubprocessError):
             pass
-    elif system == "Windows":
+    elif sys.platform == "win32":  # (not `system`) so mypy skips this branch on Linux/macOS
         try:
             import winreg
 

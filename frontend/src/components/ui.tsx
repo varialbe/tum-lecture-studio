@@ -151,3 +151,45 @@ export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
     />
   );
 }
+
+/** Accessible on/off switch (role="switch"). */
+export function Switch({
+  checked,
+  onChange,
+  label,
+  busy,
+  className,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: ReactNode;
+  busy?: boolean;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={busy}
+      onClick={() => onChange(!checked)}
+      className={clsx("group inline-flex items-center gap-2 text-[13px] disabled:opacity-60", className)}
+    >
+      <span
+        className={clsx(
+          "relative h-[18px] w-8 shrink-0 rounded-full border transition-colors",
+          checked ? "border-accent bg-accent" : "border-line-strong bg-board-3",
+        )}
+        aria-hidden
+      >
+        <span
+          className={clsx(
+            "absolute top-[2px] size-3 rounded-full transition-[left] duration-150",
+            checked ? "left-[15px] bg-accent-ink" : "left-[2px] bg-chalk-2",
+          )}
+        />
+      </span>
+      <span className={checked ? "text-chalk" : "text-chalk-2"}>{label}</span>
+    </button>
+  );
+}
