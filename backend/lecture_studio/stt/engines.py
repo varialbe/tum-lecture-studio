@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import threading
 from pathlib import Path
@@ -99,7 +100,10 @@ class MlxWhisperEngine:
     ) -> TranscriptionResult:
         try:
             import mlx_whisper
-            import mlx_whisper.transcribe as mt
+
+            # Not `import mlx_whisper.transcribe as mt`: the package re-exports the
+            # `transcribe` function under that name, shadowing the submodule.
+            mt = importlib.import_module("mlx_whisper.transcribe")
         except ImportError as exc:
             raise SttUnavailable("mlx-whisper is not installed (pip install '.[mlx]', macOS arm64)") from exc
 
@@ -107,10 +111,15 @@ class MlxWhisperEngine:
         orig_tqdm = mt.tqdm.tqdm
 
         class _Hook(orig_tqdm):  # type: ignore[misc, valid-type]
+            # mlx-whisper passes disable=True (verbose=False), and a disabled tqdm
+            # never advances self.n, so count frames ourselves.
+            _done = 0.0
+
             def update(self, n: float | None = 1) -> bool | None:
                 r = super().update(n)
+                self._done += n or 0
                 if self.total:
-                    on_progress(min(1.0, self.n / self.total))
+                    on_progress(min(1.0, self._done / self.total))
                 return r
 
         with self._lock:  # tqdm patch is module-global
