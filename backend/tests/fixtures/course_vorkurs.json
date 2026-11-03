@@ -1,0 +1,257 @@
+{
+ "course": {
+  "id": 2447,
+  "name": " Vorkurs Höhere Mathematik (DE)",
+  "slug": "WiSe26_PcMAEG",
+  "semester": {
+   "teachingTerm": "W",
+   "year": 2026
+  },
+  "tumOnlineIdentifier": "",
+  "vodEnabled": true,
+  "downloadsEnabled": true,
+  "chatEnabled": false,
+  "anonymousChatEnabled": false,
+  "moderatedChatEnabled": false,
+  "vodChatEnabled": false,
+  "streams": [
+   {
+    "id": 75911,
+    "name": "Vorkurs: Integralrechnung",
+    "description": "",
+    "courseId": 2447,
+    "start": "2026-10-08T06:30:00Z",
+    "end": "2026-10-08T08:15:00Z",
+    "chatEnabled": false,
+    "roomName": "",
+    "roomCode": "",
+    "eventTypeName": "",
+    "tumOnlineEventId": 0,
+    "seriesIdentifier": "f9a9a1c3-52e5-40dc-a912-1a8441989d42",
+    "playlistUrl": "https://edge.live.rbg.tum.de/vod/75911/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlPres": "https://edge.live.rbg.tum.de/vod/75911/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlCam": "https://edge.live.rbg.tum.de/vod/75911/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED",
+    "liveNow": false,
+    "liveNowTimestamp": "0001-01-01T00:00:00Z",
+    "recording": true,
+    "ended": false,
+    "vodViews": 0,
+    "startOffset": 0,
+    "endOffset": 0,
+    "duration": 6300,
+    "downloads": [
+     {
+      "friendlyName": "Combined",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75911/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED&download=1"
+     },
+     {
+      "friendlyName": "Camera",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75911/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED&download=1"
+     },
+     {
+      "friendlyName": "Presentation",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75911/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED&download=1"
+     }
+    ],
+    "isPlanned": false,
+    "isComingUp": false,
+    "hlsUrl": "https://edge.live.rbg.tum.de/vod/75911/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "isPubliclyVisible": true
+   },
+   {
+    "id": 75910,
+    "name": "Vorkurs: Differentialrechnung",
+    "description": "",
+    "courseId": 2447,
+    "start": "2026-10-07T06:30:00Z",
+    "end": "2026-10-07T08:15:00Z",
+    "chatEnabled": false,
+    "roomName": "",
+    "roomCode": "",
+    "eventTypeName": "",
+    "tumOnlineEventId": 0,
+    "seriesIdentifier": "f9a9a1c3-52e5-40dc-a912-1a8441989d42",
+    "playlistUrl": "https://edge.live.rbg.tum.de/vod/75910/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlPres": "https://edge.live.rbg.tum.de/vod/75910/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlCam": "https://edge.live.rbg.tum.de/vod/75910/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED",
+    "liveNow": false,
+    "liveNowTimestamp": "0001-01-01T00:00:00Z",
+    "recording": true,
+    "ended": false,
+    "vodViews": 0,
+    "startOffset": 0,
+    "endOffset": 0,
+    "duration": 6300,
+    "downloads": [
+     {
+      "friendlyName": "Combined",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75910/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED&download=1"
+     },
+     {
+      "friendlyName": "Camera",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75910/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED&download=1"
+     },
+     {
+      "friendlyName": "Presentation",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75910/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED&download=1"
+     }
+    ],
+    "isPlanned": false,
+    "isComingUp": false,
+    "hlsUrl": "https://edge.live.rbg.tum.de/vod/75910/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "isPubliclyVisible": true
+   },
+   {
+    "id": 75909,
+    "name": "Vorkurs: Matrizen, Matrixmultiplikation, Norm, Skalarprodukt, orthogonale Projektion",
+    "description": "",
+    "courseId": 2447,
+    "start": "2026-10-06T06:30:00Z",
+    "end": "2026-10-06T08:15:00Z",
+    "chatEnabled": false,
+    "roomName": "",
+    "roomCode": "",
+    "eventTypeName": "",
+    "tumOnlineEventId": 0,
+    "seriesIdentifier": "f9a9a1c3-52e5-40dc-a912-1a8441989d42",
+    "playlistUrl": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlPres": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlCam": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED",
+    "liveNow": false,
+    "liveNowTimestamp": "0001-01-01T00:00:00Z",
+    "recording": true,
+    "ended": false,
+    "vodViews": 0,
+    "startOffset": 0,
+    "endOffset": 0,
+    "duration": 6300,
+    "downloads": [
+     {
+      "friendlyName": "Combined",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED&download=1"
+     },
+     {
+      "friendlyName": "Camera",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED&download=1"
+     },
+     {
+      "friendlyName": "Presentation",
+      "downloadUrl": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED&download=1"
+     }
+    ],
+    "isPlanned": false,
+    "isComingUp": false,
+    "hlsUrl": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "isPubliclyVisible": true
+   },
+   {
+    "id": 99999,
+    "name": "Ohne Download",
+    "description": "",
+    "courseId": 2447,
+    "start": "2026-10-06T06:30:00Z",
+    "end": "2026-10-06T08:15:00Z",
+    "chatEnabled": false,
+    "roomName": "",
+    "roomCode": "",
+    "eventTypeName": "",
+    "tumOnlineEventId": 0,
+    "seriesIdentifier": "f9a9a1c3-52e5-40dc-a912-1a8441989d42",
+    "playlistUrl": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlPres": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED",
+    "playlistUrlCam": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED",
+    "liveNow": false,
+    "liveNowTimestamp": "0001-01-01T00:00:00Z",
+    "recording": true,
+    "ended": false,
+    "vodViews": 0,
+    "startOffset": 0,
+    "endOffset": 0,
+    "duration": 6300,
+    "downloads": [],
+    "isPlanned": false,
+    "isComingUp": false,
+    "hlsUrl": "https://edge.live.rbg.tum.de/vod/75909/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+    "isPubliclyVisible": true
+   },
+   {
+    "id": 99998,
+    "name": "Geplant",
+    "description": "",
+    "courseId": 2447,
+    "start": "2026-10-06T06:30:00Z",
+    "end": "2026-10-06T08:15:00Z",
+    "chatEnabled": false,
+    "roomName": "",
+    "roomCode": "",
+    "eventTypeName": "",
+    "tumOnlineEventId": 0,
+    "seriesIdentifier": "f9a9a1c3-52e5-40dc-a912-1a8441989d42",
+    "playlistUrl": "",
+    "playlistUrlPres": "",
+    "playlistUrlCam": "",
+    "liveNow": false,
+    "liveNowTimestamp": "0001-01-01T00:00:00Z",
+    "recording": false,
+    "ended": false,
+    "vodViews": 0,
+    "startOffset": 0,
+    "endOffset": 0,
+    "duration": 6300,
+    "downloads": [],
+    "isPlanned": true,
+    "isComingUp": false,
+    "hlsUrl": "",
+    "isPubliclyVisible": true
+   }
+  ],
+  "cameraPresetPreferences": "[{\"lecture_hall_id\":11,\"preset_id\":1}]",
+  "sourcePreferences": "[{\"lecture_hall_id\":11,\"source_mode\":0}]",
+  "lastRecording": {
+   "id": 75912,
+   "name": "Vorkurs: Organisatorisches, Aussagenlogik, Mengen",
+   "description": "* Organisatorisches\n* Aussagenlogik\n* Mengen",
+   "courseId": 2447,
+   "start": "2026-09-28T06:30:00Z",
+   "end": "2026-09-28T08:15:00Z",
+   "chatEnabled": false,
+   "roomName": "",
+   "roomCode": "",
+   "eventTypeName": "",
+   "tumOnlineEventId": 0,
+   "seriesIdentifier": "f9a9a1c3-52e5-40dc-a912-1a8441989d42",
+   "playlistUrl": "https://edge.live.rbg.tum.de/vod/75912/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+   "playlistUrlPres": "https://edge.live.rbg.tum.de/vod/75912/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED",
+   "playlistUrlCam": "https://edge.live.rbg.tum.de/vod/75912/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED",
+   "liveNow": false,
+   "liveNowTimestamp": "0001-01-01T00:00:00Z",
+   "recording": true,
+   "ended": false,
+   "vodViews": 0,
+   "startOffset": 0,
+   "endOffset": 0,
+   "duration": 6300,
+   "downloads": [
+    {
+     "friendlyName": "Combined",
+     "downloadUrl": "https://edge.live.rbg.tum.de/vod/75912/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED&download=1"
+    },
+    {
+     "friendlyName": "Camera",
+     "downloadUrl": "https://edge.live.rbg.tum.de/vod/75912/STREAM_VERSION_CAMERA/playlist.m3u8?jwt=REDACTED&download=1"
+    },
+    {
+     "friendlyName": "Presentation",
+     "downloadUrl": "https://edge.live.rbg.tum.de/vod/75912/STREAM_VERSION_PRESENTATION/playlist.m3u8?jwt=REDACTED&download=1"
+    }
+   ],
+   "isPlanned": false,
+   "isComingUp": false,
+   "hlsUrl": "https://edge.live.rbg.tum.de/vod/75912/STREAM_VERSION_COMBINED/playlist.m3u8?jwt=REDACTED",
+   "isPubliclyVisible": true
+  },
+  "visibility": "public",
+  "pinned": false,
+  "isAdmin": false
+ }
+}

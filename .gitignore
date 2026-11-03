@@ -1,0 +1,35 @@
+# Secrets & local config
+.env
+.env.*
+!.env.example
+*.session.json
+session.json
+
+# Runtime data (recordings, transcripts, db, models)
+data/
+output/
+models/
+*.db
+*.db-journal
+*.part
+benchmarks/audio/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/dist/
+backend/lecture_studio/static/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
