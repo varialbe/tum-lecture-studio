@@ -41,6 +41,8 @@ def run_one(args: argparse.Namespace) -> None:
         store.download(spec)
     path = store.local_path(spec)
     hw = detect()
+    sampler = MemorySampler(cuda=device == "cuda", interval=0.25)  # baseline before the model loads
+    sampler.start()
     t_load = time.time()
     if spec.engine == "mlx-whisper":
         engine = MlxWhisperEngine(path, model_id)
@@ -50,8 +52,6 @@ def run_one(args: argparse.Namespace) -> None:
     load_s = time.time() - t_load
     opts = TranscribeOptions(language=args.language or None,
                              initial_prompt=None if args.no_prompt else build_prompt(DEFAULT_VOCABULARY))
-    sampler = MemorySampler(cuda=device == "cuda", interval=0.25)
-    sampler.start()
     t0 = time.time()
     res = engine.transcribe(Path(args.wav), opts, lambda _f: None)
     wall = time.time() - t0
@@ -60,7 +60,7 @@ def run_one(args: argparse.Namespace) -> None:
     dev_label = (hw.cuda_devices[0]["name"] if device == "cuda" and hw.cuda_devices else
                  f"{hw.cpu} ({hw.cpu_cores} cores)" if device == "cpu" else device)
     print("RESULT " + json.dumps({"config": args.child, "device": dev_label, "load_s": load_s, "wall_s": wall,
-                                  "peak_mb": peak, "text": text, "segments": len(res.segments),
+                                  "peak_mb": peak, "mem_method": sampler.method, "rss_mb": sampler.peak_rss / 1024**2, "text": text, "segments": len(res.segments),
                                   "language": res.language}, ensure_ascii=False))
 
 
@@ -117,7 +117,7 @@ def main() -> None:
     print("\n| config | device | wall s | RTF | peak MB | WER* | CER* |")
     for r in results:
         if "text" in r:
-            print(f"| {r['config']} | {r['device']} | {r['wall_s']:.1f} | {r['rtf']:.3f} | {r['peak_mb']:.0f} | "
+            print(f"| {r['config']} | {r['device']} | {r['wall_s']:.1f} | {r['rtf']:.3f} | {r['peak_mb']:.0f} ({r['mem_method']}) | {r['rss_mb']:.0f} | "
                   f"{r['wer']:.3f} | {r['cer']:.3f} |")
         else:
             print(f"| {r['config']} | failed: {r['error']} |")

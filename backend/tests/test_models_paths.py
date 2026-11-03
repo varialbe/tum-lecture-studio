@@ -55,6 +55,11 @@ def test_semester():
         ("Diskrete Strukturen (IN0015)", "ds", "", "IN0015"),
         ("Einführung in die Rechnerarchitektur", "ERA", "", "IN0004"),
         ("Einführung in die Informatik und Programmieren", "EIDIP", "", "EIDIP"),
+        # actual TUM-Live title, WiSe 2026/27
+        ("Einführung in die Informatik und das Programmieren (CIT12300...)", "950975968", "", "EIDIP"),
+        ("Diskrete Strukturen (IN0015)", "950940756", "", "IN0015"),
+        ("Einführung in die Rechnerarchitektur (IN0004)", "era26w", "", "IN0004"),
+        ("Advanced Topics of Software Engineering", "eidi", "", None),
         ("Grundlagen", "IN0004WS26", "", "IN0004"),
         ("Analysis für Informatik", "ana", "", None),
     ],

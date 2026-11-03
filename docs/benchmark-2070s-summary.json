@@ -1,0 +1,92 @@
+{
+  "media": "Vorkurs: Trigonometrie (TUM-Live public course WiSe26_PcMAEG, stream 75907), COMB",
+  "clip_start": 1500.0,
+  "clip_seconds": 180.0,
+  "reference": "first config (fw-large-v3:cuda:float16)",
+  "results": [
+    {
+      "config": "fw-large-v3:cuda:float16",
+      "device": "NVIDIA GeForce RTX 2070 SUPER",
+      "load_s": 2.8580241203308105,
+      "wall_s": 12.948097467422485,
+      "peak_mb": 4201.0,
+      "mem_method": "gpu-device-delta",
+      "rss_mb": 2738.83203125,
+      "segments": 23,
+      "language": "de",
+      "rtf": 0.07193387481901381,
+      "wer": 0.0,
+      "cer": 0.0
+    },
+    {
+      "config": "fw-large-v3:cuda:int8_float16",
+      "device": "NVIDIA GeForce RTX 2070 SUPER",
+      "load_s": 4.850080966949463,
+      "wall_s": 16.95392370223999,
+      "peak_mb": 2377.0,
+      "mem_method": "gpu-device-delta",
+      "rss_mb": 3079.515625,
+      "segments": 23,
+      "language": "de",
+      "rtf": 0.09418846501244439,
+      "wer": 0.002577319587628866,
+      "cer": 0.0011750881316098707
+    },
+    {
+      "config": "fw-large-v3-turbo:cuda:float16",
+      "device": "NVIDIA GeForce RTX 2070 SUPER",
+      "load_s": 1.6333436965942383,
+      "wall_s": 3.9108896255493164,
+      "peak_mb": 2333.0,
+      "mem_method": "gpu-device-delta",
+      "rss_mb": 1666.58203125,
+      "segments": 38,
+      "language": "de",
+      "rtf": 0.02172716458638509,
+      "wer": 0.04381443298969072,
+      "cer": 0.01645123384253819
+    },
+    {
+      "config": "fw-large-v3-turbo:cuda:int8_float16",
+      "device": "NVIDIA GeForce RTX 2070 SUPER",
+      "load_s": 2.686488628387451,
+      "wall_s": 4.713870525360107,
+      "peak_mb": 1238.0,
+      "mem_method": "gpu-device-delta",
+      "rss_mb": 1688.78125,
+      "segments": 48,
+      "language": "de",
+      "rtf": 0.02618816958533393,
+      "wer": 0.05154639175257732,
+      "cer": 0.027614571092831962
+    },
+    {
+      "config": "fw-large-v3-turbo:cpu:int8",
+      "device": "AMD Ryzen 7 5700X 8-Core Processor (8 cores)",
+      "load_s": 2.565246820449829,
+      "wall_s": 42.26316428184509,
+      "peak_mb": 1888.9140625,
+      "mem_method": "rss",
+      "rss_mb": 1888.9140625,
+      "segments": 54,
+      "language": "de",
+      "rtf": 0.23479535712136163,
+      "wer": 0.05412371134020619,
+      "cer": 0.022326674500587545
+    },
+    {
+      "config": "fw-small:cpu:int8",
+      "device": "AMD Ryzen 7 5700X 8-Core Processor (8 cores)",
+      "load_s": 0.9051244258880615,
+      "wall_s": 29.949801921844482,
+      "peak_mb": 920.36328125,
+      "mem_method": "rss",
+      "rss_mb": 920.36328125,
+      "segments": 24,
+      "language": "de",
+      "rtf": 0.16638778845469157,
+      "wer": 0.10824742268041238,
+      "cer": 0.06227967097532315
+    }
+  ]
+}

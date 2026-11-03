@@ -215,7 +215,7 @@ PRIORITY_COURSES: list[dict[str, Any]] = [
     {
         "id": "EIDIP",
         "label": "Einführung in die Informatik und Programmieren",
-        "patterns": [r"informatik\s+und\s+programmieren", r"\bEIDIP\b", r"\bEIP\b"],
+        "patterns": [r"informatik\s+und\s+(das\s+)?programmieren", r"\bEIDIP\b", r"\bEIP\b"],
     },
 ]
 
@@ -228,4 +228,4 @@ def match_priority(course: Course) -> str | None:
     return None
 
 
-PRIORITY_SEARCH_TERMS = ["Diskrete Strukturen", "Rechnerarchitektur", "Informatik und Programmieren"]
+PRIORITY_SEARCH_TERMS = ["Diskrete Strukturen", "Rechnerarchitektur", "Informatik und das Programmieren"]
