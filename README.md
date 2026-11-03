@@ -96,6 +96,30 @@ docker compose --profile gpu up -d --build studio-gpu     # NVIDIA image (Linux,
 
 The container publishes the port on `127.0.0.1` only, and all data lives in `./data` (see [Storage](#storage)).
 
+**Prebuilt image.** CI publishes `ghcr.io/varialbe/tum-lecture-studio:latest` (amd64 + arm64) and `:cuda` on
+every push to `main`. The repository is private, so the package is too: grant the other person read access to
+the package on GitHub, or let them log in with a token that has `read:packages`.
+
+```bash
+docker login ghcr.io                     # GitHub username + token with read:packages
+echo "TLS_IMAGE=ghcr.io/varialbe/tum-lecture-studio:latest" >> .env
+docker compose pull studio && docker compose up -d studio
+```
+
+### Install it as an app
+
+The GUI is a Progressive Web App. Open http://localhost:8420 and install it:
+
+* **Chrome / Edge** (Windows, macOS, Linux): *Install app* at the bottom of the sidebar, or the install icon
+  in the address bar.
+* **Safari on macOS 14+**: *File → Add to Dock*.
+
+It then opens in its own window with its own Dock/taskbar icon, and the app shell loads even while the backend
+restarts. The backend must be running: Docker starts it again automatically (`restart: unless-stopped`), and
+the native setup runs it through `start.cmd` / `scripts/start.sh`. `localhost` counts as a secure origin, so
+no certificate is needed. Installing from another machine on the network would need HTTPS and a login in
+front of the app, which isn't set up.
+
 ## Installation by platform
 
 ### macOS (Apple Silicon)

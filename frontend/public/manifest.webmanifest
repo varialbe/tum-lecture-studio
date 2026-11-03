@@ -1,0 +1,23 @@
+{
+  "name": "TUM Lecture Studio",
+  "short_name": "Lecture Studio",
+  "description": "Download TUM-Live lectures and transcribe them locally.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#18211E",
+  "theme_color": "#18211E",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Courses", "url": "/courses" },
+    { "name": "Queue", "url": "/queue" },
+    { "name": "Transcripts", "url": "/transcripts" }
+  ]
+}

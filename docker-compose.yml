@@ -26,14 +26,15 @@ x-studio: &studio
 services:
   studio:
     <<: *studio
-    image: tum-lecture-studio:latest
+    # Prebuilt: TLS_IMAGE=ghcr.io/varialbe/tum-lecture-studio:latest docker compose pull studio
+    image: ${TLS_IMAGE:-tum-lecture-studio:latest}
     build:
       context: .
       target: cpu
 
   studio-gpu:
     <<: *studio
-    image: tum-lecture-studio:cuda
+    image: ${TLS_IMAGE_CUDA:-tum-lecture-studio:cuda}
     build:
       context: .
       target: cuda

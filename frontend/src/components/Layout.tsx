@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BookOpen, Cpu, Download, FileText, LayoutDashboard, LogIn, Moon, Sun } from "lucide-react";
+import { AppWindow, BookOpen, Cpu, Download, FileText, LayoutDashboard, LogIn, Moon, Sun } from "lucide-react";
 import { api } from "../lib/api";
 import { useStore } from "../lib/store";
 import { Select } from "./ui";
@@ -33,10 +33,40 @@ function useTheme(): [string, () => void] {
   return [theme, () => setTheme((t) => (t === "dark" ? "light" : "dark"))];
 }
 
+interface InstallPrompt extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: string }>;
+}
+
+/** PWA install: native prompt in Chrome/Edge; Safari has no prompt, so we explain the menu path. */
+function useInstall() {
+  const [prompt, setPrompt] = useState<InstallPrompt | null>(null);
+  const [installed, setInstalled] = useState(
+    () => window.matchMedia("(display-mode: standalone)").matches || (navigator as { standalone?: boolean }).standalone === true,
+  );
+  useEffect(() => {
+    const onPrompt = (e: Event) => {
+      e.preventDefault();
+      setPrompt(e as InstallPrompt);
+    };
+    const onInstalled = () => setInstalled(true);
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
+  const isSafari = /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+  return { prompt, installed, isSafari, clear: () => setPrompt(null) };
+}
+
 export function Layout() {
   const { session, jobs, semester, setSemester, connected, toasts } = useStore();
   const [semesters, setSemesters] = useState<{ key: string; label: string }[]>([]);
   const [theme, toggleTheme] = useTheme();
+  const install = useInstall();
+  const { toast } = useStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -109,6 +139,23 @@ export function Layout() {
             <span className={clsx("size-1.5 rounded-full", connected ? "bg-ok" : "bg-warn")} aria-hidden />
             {connected ? "Live" : "Reconnecting"}
           </span>
+          {!install.installed && (install.prompt || install.isSafari) && (
+            <button
+              onClick={async () => {
+                if (install.prompt) {
+                  await install.prompt.prompt();
+                  install.clear();
+                } else {
+                  toast("In Safari: File → Add to Dock (macOS) or Share → Add to Home Screen (iOS).");
+                }
+              }}
+              className="flex items-center gap-1.5 rounded p-1 hover:bg-board-3 hover:text-chalk"
+              title="Install as an app"
+            >
+              <AppWindow className="size-4" aria-hidden />
+              <span className="max-md:hidden">Install app</span>
+            </button>
+          )}
           <button onClick={toggleTheme} className="rounded p-1 hover:bg-board-3 hover:text-chalk" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>

@@ -582,6 +582,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 raise HTTPException(404)
             f = (static_dir / path).resolve()
             if path and f.is_file() and static_dir.resolve() in f.parents:
+                if f.name == "sw.js":  # the browser must always see a new service worker
+                    return FileResponse(
+                        f, media_type="text/javascript", headers={"Cache-Control": "no-cache"}
+                    )
+                if f.suffix == ".webmanifest":
+                    return FileResponse(f, media_type="application/manifest+json")
                 return FileResponse(f)
             return FileResponse(index, headers={"Cache-Control": "no-cache"})
     else:
