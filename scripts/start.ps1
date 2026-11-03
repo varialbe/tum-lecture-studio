@@ -39,10 +39,10 @@ if (Get-Command nvidia-smi -ErrorAction SilentlyContinue) { $extras = "cuda" }
 Set-Location "$Root\backend"
 if (-not (Test-Path .venv\Scripts\python.exe)) {
   Write-Host "Creating Python environment (first start only)..."
-  uv venv --python 3.11 .venv; Check "Creating the Python environment"
+  cmd /c "uv venv --python 3.11 .venv 2>&1"; Check "Creating the Python environment"
 }
 Write-Host "Installing/updating dependencies ($extras)... the first time this downloads ~1-2 GB."
-uv pip install --python .venv\Scripts\python.exe -q -e ".[$extras]"; Check "Installing dependencies"
+cmd /c "uv pip install --python .venv\Scripts\python.exe -q -e .[$extras] 2>&1"; Check "Installing dependencies"
 if (-not $env:TLS_DATA_DIR) { $env:TLS_DATA_DIR = "$Root\data" }
 
 if ($Mode -eq "companion") { & .venv\Scripts\lecture-studio-stt.exe --host 127.0.0.1 --port 8421 --models-dir "$env:TLS_DATA_DIR\models"; exit }
