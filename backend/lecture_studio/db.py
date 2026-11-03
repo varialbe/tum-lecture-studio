@@ -155,6 +155,12 @@ class Database:
         self._conn.row_factory = sqlite3.Row
         with self._lock:
             self._conn.executescript(SCHEMA)
+            self._migrate()
+
+    def _migrate(self) -> None:
+        cols = {r[1] for r in self._conn.execute("PRAGMA table_info(segments)").fetchall()}
+        if "words" not in cols:  # v0.2: word timings for karaoke-style highlighting
+            self._conn.execute("ALTER TABLE segments ADD COLUMN words TEXT")
 
     def close(self) -> None:
         with self._lock:

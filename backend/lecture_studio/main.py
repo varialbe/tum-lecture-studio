@@ -113,6 +113,7 @@ SETTING_KEYS = {
     "stt.beam_size",
     "stt.remote_url",
     "auto_transcribe",
+    "download.stream_capture",
     "download.variant",
 }
 
@@ -183,6 +184,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 **state.stt.defaults(),
                 "auto_transcribe": state.jobs._auto_transcribe(),
                 "download_variant": state.db.get_setting("download.variant", "COMB"),
+                "stream_capture": state.jobs.stream_capture_allowed(),
             },
             "paths": {
                 "recordings": str(settings.recordings_dir),
@@ -309,7 +311,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             if rec is None:
                 results.append({"stream_id": it.stream_id, "error": "recording not found"})
                 continue
-            if not rec.download_for(it.variant):
+            if not rec.download_for(it.variant) and not (
+                state.jobs.stream_capture_allowed() and it.variant in rec.playlists
+            ):
                 results.append(
                     {
                         "stream_id": it.stream_id,
@@ -503,6 +507,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def delete_transcript(tid: str) -> dict[str, Any]:
         transcript_store.delete(state.db, tid)
         return {"ok": True}
+
+    @app.get("/api/transcripts/{tid}/subtitles.vtt")
+    async def subtitles(tid: str) -> Response:
+        """Inline WebVTT for the player's <track> (export/vtt is the download)."""
+        t = transcript_store.get(state.db, tid)
+        if not t:
+            raise HTTPException(404)
+        return Response(
+            exporter.to_vtt(t["segments"]),
+            media_type="text/vtt; charset=utf-8",
+            headers={"Cache-Control": "no-cache"},
+        )
 
     @app.get("/api/transcripts/{tid}/export/{fmt}")
     async def export(tid: str, fmt: str) -> Response:

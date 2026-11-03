@@ -12,6 +12,7 @@ dependencies = [
   "pydantic>=2.7",
   "psutil>=5.9",
   "python-multipart>=0.0.9",
+  "yt-dlp>=2025.1",
 ]
 
 [project.optional-dependencies]

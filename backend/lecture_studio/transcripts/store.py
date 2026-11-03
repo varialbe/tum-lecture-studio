@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import time
 from pathlib import Path
 from typing import Any
@@ -53,7 +54,15 @@ def save(
             now,
         ),
     )
-    rows = [{"start": s.start, "end": s.end, "text": s.text} for s in segments]
+    rows = [
+        {
+            "start": s.start,
+            "end": s.end,
+            "text": s.text,
+            "words": [[round(w.start, 3), round(w.end, 3), w.word] for w in s.words] or None,
+        }
+        for s in segments
+    ]
     _write_segments(db, transcript_id, rows)
     write_files(db, root, transcript_id, folder)
     return transcript_id
@@ -61,7 +70,11 @@ def save(
 
 def _write_segments(db: Database, tid: str, rows: list[dict[str, Any]]) -> None:
     for i, s in enumerate(rows):
-        db.execute("INSERT INTO segments VALUES (?,?,?,?,?)", (tid, i, s["start"], s["end"], s["text"]))
+        words = json.dumps(s["words"], ensure_ascii=False) if s.get("words") else None
+        db.execute(
+            "INSERT INTO segments (transcript_id, idx, start, end, text, words) VALUES (?,?,?,?,?,?)",
+            (tid, i, s["start"], s["end"], s["text"], words),
+        )
         db.execute("INSERT INTO segments_fts (text, transcript_id, idx) VALUES (?,?,?)", (s["text"], tid, i))
 
 
@@ -70,8 +83,10 @@ def get(db: Database, tid: str) -> dict[str, Any] | None:
     if not t:
         return None
     t["segments"] = db.query(
-        "SELECT idx, start, end, text FROM segments WHERE transcript_id=? ORDER BY idx", (tid,)
+        "SELECT idx, start, end, text, words FROM segments WHERE transcript_id=? ORDER BY idx", (tid,)
     )
+    for seg in t["segments"]:
+        seg["words"] = json.loads(seg["words"]) if seg.get("words") else None
     return t
 
 
@@ -99,7 +114,11 @@ def update_segments(db: Database, root: Path, tid: str, edits: list[dict[str, An
     """Apply text edits ({idx, text}) made in the viewer."""
     for e in edits:
         text = " ".join(str(e["text"]).split())
-        db.execute("UPDATE segments SET text=? WHERE transcript_id=? AND idx=?", (text, tid, int(e["idx"])))
+        # edited text no longer matches the word timings -> fall back to segment highlighting
+        db.execute(
+            "UPDATE segments SET text=?, words=NULL WHERE transcript_id=? AND idx=?",
+            (text, tid, int(e["idx"])),
+        )
         db.execute(
             "UPDATE segments_fts SET text=? WHERE transcript_id=? AND idx=?", (text, tid, int(e["idx"]))
         )

@@ -54,8 +54,10 @@ export default function CourseDetail() {
     return m;
   }, [jobs, slug]);
 
+  const capture = !!system?.settings.stream_capture;
+  const canGet = (r: Recording, v: string) => r.downloadable_variants.includes(v) || (capture && r.variants.includes(v));
   const vods = data?.recordings.filter((r) => r.is_vod) ?? [];
-  const selectable = vods.filter((r) => r.downloadable_variants.includes(variant));
+  const selectable = vods.filter((r) => canGet(r, variant));
 
   const download = async (ids: number[], v = variant) => {
     setBusy(true);
@@ -117,7 +119,13 @@ export default function CourseDetail() {
           <span className="flex flex-wrap items-center gap-2">
             {c.tum_online_identifier || c.slug} · {c.semester_label}
             {c.priority && <Badge tone="accent">{c.priority}</Badge>}
-            {c.downloads_enabled ? <Badge tone="info">Downloads enabled</Badge> : <Badge>Downloads disabled by the lecturer</Badge>}
+            {c.downloads_enabled ? (
+              <Badge tone="info">Downloads enabled</Badge>
+            ) : capture ? (
+              <Badge tone="warn">Stream recording</Badge>
+            ) : (
+              <Badge>Downloads disabled by the lecturer</Badge>
+            )}
           </span>
         }
         actions={
@@ -176,6 +184,7 @@ export default function CourseDetail() {
                   key={r.id}
                   r={r}
                   variant={variant}
+                  capture={capture}
                   jobs={liveJobs.get(r.id) ?? []}
                   checked={selected.has(r.id)}
                   onCheck={() =>
@@ -214,6 +223,7 @@ function BackLink() {
 function RecordingRow({
   r,
   variant,
+  capture,
   jobs,
   checked,
   onCheck,
@@ -222,13 +232,15 @@ function RecordingRow({
 }: {
   r: Recording;
   variant: string;
+  capture: boolean;
   jobs: Job[];
   checked: boolean;
   onCheck: () => void;
   onDownload: (v: string) => void;
   onTranscribe: (v: string) => void;
 }) {
-  const can = r.downloadable_variants.includes(variant);
+  const permitted = r.downloadable_variants.includes(variant);
+  const can = permitted || (capture && r.variants.includes(variant));
   const local = r.local;
   const downloaded = local?.downloaded ?? [];
   const dlJob = jobs.find((j) => j.kind === "download" && (j.status === "running" || j.status === "queued"));
@@ -276,14 +288,14 @@ function RecordingRow({
           </span>
         ) : can ? (
           <div className="flex items-center gap-2">
-            <Button size="sm" icon={<Download className="size-3.5" />} onClick={() => onDownload(variant)}>
-              {failedDl ? "Retry" : "Download"}
+            <Button size="sm" icon={<Download className="size-3.5" />} onClick={() => onDownload(variant)} title={permitted ? "Download the file TUM-Live offers" : "Record the stream"}>
+              {failedDl ? "Retry" : permitted ? "Download" : "Record"}
             </Button>
             {failedDl && <span className="truncate text-[12px] text-bad" title={failedDl.error ?? ""}>Failed</span>}
           </div>
         ) : (
-          <span className="text-[13px] text-muted" title="The lecturer has not allowed downloads for this variant">
-            Not permitted
+          <span className="text-[13px] text-muted" title="The lecturer has not allowed downloads. You can turn on stream recording in Models & settings.">
+            Stream only
           </span>
         )}
       </td>

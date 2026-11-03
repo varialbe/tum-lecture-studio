@@ -16,6 +16,7 @@ import json
 import os
 import re
 import shutil
+import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -146,6 +147,110 @@ def _total_from_content_range(value: str | None) -> int | None:
         return None
     m = re.search(r"/(\d+)\s*$", value)
     return int(m.group(1)) if m else None
+
+
+async def hls_duration(url: str, transport: httpx.AsyncBaseTransport | None = None) -> float | None:
+    """Exact media length from an HLS playlist (sum of #EXTINF); follows one master-playlist hop."""
+    try:
+        async with httpx.AsyncClient(timeout=30, follow_redirects=True, transport=transport) as http:
+            text = (await http.get(url)).text
+            if "#EXT-X-STREAM-INF" in text:
+                variants = re.findall(r"#EXT-X-STREAM-INF:[^\n]*BANDWIDTH=(\d+)[^\n]*\n([^\n#]+)", text)
+                if not variants:
+                    return None
+                best = max(variants, key=lambda v: int(v[0]))[1].strip()
+                text = (await http.get(str(httpx.URL(url).join(best)))).text
+    except httpx.HTTPError:
+        return None
+    if "#EXT-X-KEY:METHOD=SAMPLE-AES" in text or "KEYFORMAT=" in text:
+        raise DownloadError("stream uses DRM encryption - not supported", transient=False)
+    total = sum(float(x) for x in re.findall(r"#EXTINF:([\d.]+)", text))
+    return total or None
+
+
+def _ytdlp_available() -> bool:
+    try:
+        import yt_dlp  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
+async def ytdlp_hls_download(url: str, dest: Path, on_progress: ProgressCb, *, fragments: int = 8) -> int:
+    """Record an HLS stream with yt-dlp: parallel fragments, real fragment-based progress, and
+    resume of partially downloaded fragments after an interruption. Output is remuxed to MP4
+    without re-encoding (ffmpeg -c copy via yt-dlp's fixup)."""
+    import yt_dlp
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    loop = asyncio.get_running_loop()
+    cancelled = threading.Event()
+    meter = _SpeedMeter()
+    last = [0.0]
+    stem = dest.with_suffix("")  # yt-dlp appends the extension itself
+
+    def hook(d: dict) -> None:
+        if cancelled.is_set():
+            raise DownloadError("cancelled", transient=False)
+        if d.get("status") != "downloading":
+            return
+        now = time.monotonic()
+        if now - last[0] < 0.5:
+            return
+        last[0] = now
+        idx, count = d.get("fragment_index"), d.get("fragment_count")
+        frac = (idx / count) if idx and count else None
+        done = int(d.get("downloaded_bytes") or 0)
+        est = d.get("total_bytes") or d.get("total_bytes_estimate")
+        pr = Progress("downloading", done, int(est) if est else None, frac, d.get("speed") or meter.add(done))
+        loop.call_soon_threadsafe(on_progress, pr)
+
+    opts = {
+        "outtmpl": str(stem) + ".%(ext)s",
+        "quiet": True,
+        "no_warnings": True,
+        "noprogress": True,
+        "concurrent_fragment_downloads": fragments,
+        "continuedl": True,
+        "retries": 10,
+        "fragment_retries": 10,
+        "http_headers": {"User-Agent": USER_AGENT},
+        "progress_hooks": [hook],
+        "merge_output_format": "mp4",
+        "final_ext": "mp4",
+        "postprocessors": [{"key": "FFmpegFixupM3u8"}],
+        "noplaylist": True,
+    }
+
+    def run() -> None:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            ydl.download([url])
+
+    on_progress(Progress("preparing"))
+    try:
+        await asyncio.to_thread(run)
+    except asyncio.CancelledError:
+        cancelled.set()
+        raise
+    except DownloadError:
+        raise
+    except Exception as exc:  # yt-dlp's DownloadError & friends
+        msg = str(exc)
+        expired = any(s in msg for s in ("403", "401", "Forbidden", "Unauthorized"))
+        raise DownloadError(f"yt-dlp: {msg[:300]}", expired=expired) from exc
+    produced = [
+        p
+        # not glob(): lecture filenames contain "[COMB]", which glob reads as a character class
+        for p in dest.parent.iterdir()
+        if p.name.startswith(stem.name + ".")
+        if p.suffix in (".mp4", ".ts", ".mkv") and not p.name.endswith((".part", ".ytdl"))
+    ]
+    if not produced:
+        raise DownloadError("yt-dlp finished without an output file")
+    out = max(produced, key=lambda p: p.stat().st_mtime)
+    if out != dest:
+        out.replace(dest)
+    return dest.stat().st_size
 
 
 async def ffmpeg_hls_download(

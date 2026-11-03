@@ -6,8 +6,10 @@ them into searchable, timestamped transcripts with a local Whisper model. Nothin
 
 ![Course explorer](docs/screenshots/courses.png)
 
-> For personal study. The app downloads only recordings whose lecturer enabled downloads on TUM-Live, using
-> TUM-Live's own download links, and never bypasses MFA or access controls.
+> For personal study. By default the app downloads only recordings whose lecturer enabled downloads, using
+> TUM-Live's own download links. Optional stream recording saves streams your account can already watch. Keep
+> those files to yourself: lecture recordings are the lecturers' work. The app never bypasses MFA, access
+> controls or DRM.
 
 ## Contents
 
@@ -32,7 +34,8 @@ them into searchable, timestamped transcripts with a local Whisper model. Nothin
 | **Recordings** | Per lecture: date, length, available variants (Combined / Slides / Camera), whether download is permitted, download and transcript status. Download one, many, or a whole course. |
 | **Downloads** | Persistent queue with configurable concurrency, real byte progress and speed, resume after interruption (HTTP Range), retries with exponential backoff, fresh signed links per attempt, duplicate detection, integrity check with ffprobe, cancel/retry. Files are organised as `recordings/<2026-WiSe>/<Course>/<date title [variant] #id>.mp4`. |
 | **Transcription** | ffmpeg audio extraction → silence-aware chunking → local STT (faster-whisper on NVIDIA/CPU, mlx-whisper on Apple Silicon, or any OpenAI-compatible server) → merge without lost or duplicated words → TXT, Markdown, SRT, VTT, JSON. Optional auto-transcribe after download, German language hint and a technical vocabulary prompt. |
-| **Transcript viewer** | Video playback synchronised with the transcript, clickable timestamps, search (in a lecture and across all lectures), inline editing, copy, export. |
+| **Stream recording** (opt-in) | For lectures whose lecturer disabled downloads, the app can record the HLS stream you can already watch on TUM-Live: yt-dlp with parallel fragments and fragment-based progress, resume after interruption, remux to MP4 without re-encoding, ffmpeg as the fallback. Recordings are checked against the exact playlist length. Turn it on under *Models & settings → Record streams*. DRM-protected streams are refused. |
+| **Transcript viewer** | Word-by-word highlighting that follows playback, every line clickable to jump there, subtitles in the video (toggle), a *Script only* view with a slim audio player, search (in a lecture and across all lectures), inline editing, copy, export. |
 | **Models** | Hardware detection with a recommendation, download/remove models, choose the default, and **measured** speed and memory per model after it has run on your machine. |
 
 ![Transcript viewer](docs/screenshots/transcript.png)
@@ -213,9 +216,9 @@ All settings are listed in [.env.example](.env.example).
 
 ## Known limitations
 
-* Lectures whose lecturer disabled downloads can only be streamed on TUM-Live. This is deliberate. In
-  WiSe 2026/27 that covers all three priority courses (IN0015, IN0004, EIDIP); only 3 of the 69 courses
-  visible to the test account offer downloads.
+* Lectures whose lecturer disabled downloads (in WiSe 2026/27 all three priority courses; only 3 of the 69
+  courses visible to the test account offer downloads) need *Record streams* turned on. HLS recordings can't
+  use HTTP Range, but yt-dlp resumes from the fragments already downloaded.
 * Signing in with a passkey alone isn't possible inside the app. Use *Use browser session*.
 * The SSO replay depends on TUM's login pages, and only mocked flows are tested (see below).
 * Cancelling a transcription stops the job at once, but the current chunk (up to 10 minutes of audio)

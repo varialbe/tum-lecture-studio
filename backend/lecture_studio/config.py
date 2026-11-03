@@ -41,6 +41,8 @@ class Settings:
     stt_remote_url: str | None = None
     stt_default_model: str | None = None
     auto_transcribe: bool = False
+    # Record HLS streams of lectures whose lecturer disabled downloads (opt-in).
+    stream_capture: bool = False
     static_dir: Path | None = None
     # How long to wait for the edge server to start sending a prepared MP4.
     download_first_byte_timeout: float = 600.0
@@ -80,5 +82,6 @@ def load_settings() -> Settings:
         stt_remote_url=os.environ.get("TLS_STT_REMOTE_URL") or None,
         stt_default_model=os.environ.get("TLS_STT_MODEL") or None,
         auto_transcribe=_env_bool("TLS_AUTO_TRANSCRIBE", False),
+        stream_capture=_env_bool("TLS_STREAM_CAPTURE", False),
         static_dir=Path(static) if static else (default_static if default_static.exists() else None),
     )

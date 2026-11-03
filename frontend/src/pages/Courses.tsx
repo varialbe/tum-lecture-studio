@@ -104,10 +104,12 @@ export default function Courses() {
         if (!c) continue;
         const sem = `${c.year}${c.term}`;
         const d = await api.get<{ recordings: Recording[] }>(`/api/courses/${sem}/${c.slug}`);
+        const capture = !!system?.settings.stream_capture;
+        const ok = (r: Recording) => r.downloadable_variants.includes(variant) || (capture && r.variants.includes(variant));
         const items = d.recordings
-          .filter((r) => r.is_vod && r.downloadable_variants.includes(variant))
+          .filter((r) => r.is_vod && ok(r))
           .map((r) => ({ semester: sem, slug: c.slug, stream_id: r.id, variant }));
-        skipped += d.recordings.filter((r) => r.is_vod && !r.downloadable_variants.includes(variant)).length;
+        skipped += d.recordings.filter((r) => r.is_vod && !ok(r)).length;
         if (items.length) {
           const res = await api.post<{ results: { job?: unknown; duplicate?: string }[] }>("/api/downloads", { items });
           queued += res.results.filter((x) => x.job && !x.duplicate).length;
@@ -359,8 +361,10 @@ function CourseCollection({ items, view, selected, onSelect, onFav }: Collection
 }
 
 function AccessBadge({ c }: { c: CourseSummary }) {
+  const { system } = useStore();
   if (!c.vod_enabled) return <Badge title="The lecturer has not enabled recordings">No recordings</Badge>;
   if (c.downloadable_count > 0) return <Badge tone="info">Downloadable</Badge>;
+  if (system?.settings.stream_capture) return <Badge tone="warn" title="Downloads disabled; the stream will be recorded">Recordable</Badge>;
   return <Badge title="The lecturer has disabled downloads for this course">Stream only</Badge>;
 }
 

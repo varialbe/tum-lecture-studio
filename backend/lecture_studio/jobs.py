@@ -21,10 +21,13 @@ from .db import Database
 from .downloads.engine import (
     DownloadError,
     Progress,
+    _ytdlp_available,
     ffmpeg_hls_download,
+    hls_duration,
     http_range_download,
     probe,
     verify_media,
+    ytdlp_hls_download,
 )
 from .events import EventBus
 from .paths import recording_path, sanitize_filename, semester_folder
@@ -233,6 +236,9 @@ class JobManager:
         self.bus.publish("job_removed", {"id": job_id})
         return True
 
+    def stream_capture_allowed(self) -> bool:
+        return bool(self.db.get_setting("download.stream_capture", self.settings.stream_capture))
+
     def _auto_transcribe(self) -> bool:
         return bool(self.db.get_setting("auto_transcribe", self.settings.auto_transcribe))
 
@@ -317,11 +323,15 @@ class JobManager:
         if rec is None:
             raise JobFailed("Recording no longer listed by TUM-Live (or not visible to this account)")
         dl = rec.download_for(job["variant"])
-        if dl is None:
+        hls_url = rec.playlists.get(job["variant"])
+        capture = dl is None
+        if capture and not self.stream_capture_allowed():
             raise JobFailed(
-                f"Downloads are not enabled for this recording/variant ({job['variant']}). "
-                "Only lecturer-permitted downloads are supported."
+                f"The lecturer has not enabled downloads for this lecture ({job['variant']}). "
+                "Turn on 'Record streams' in Models & settings to record the stream instead."
             )
+        if capture and not hls_url:
+            raise JobFailed(f"No {job['variant']} stream available for this lecture")
         dest = recording_path(
             self.settings.recordings_dir,
             year=sem.year,
@@ -343,8 +353,12 @@ class JobManager:
                     stage="preparing",
                     progress=None,
                     bytes_done=pr.bytes_done,
-                    message="Waiting for TUM-Live to prepare the file"
-                    + (f" (resuming at {pr.bytes_done / 1e6:.0f} MB)" if pr.bytes_done else ""),
+                    message=(
+                        "Starting stream recording"
+                        if capture
+                        else "Waiting for TUM-Live to prepare the file"
+                        + (f" (resuming at {pr.bytes_done / 1e6:.0f} MB)" if pr.bytes_done else "")
+                    ),
                 )
             elif throttle.ready() or pr.fraction == 1.0:
                 self.db.update_job(
@@ -354,28 +368,45 @@ class JobManager:
                     bytes_done=pr.bytes_done,
                     bytes_total=pr.bytes_total,
                     speed=pr.speed,
-                    message=None,
+                    message="Recording stream" if capture else None,
                 )
                 self._emit(self.db.get_job(jid))
 
+        expected = rec.duration
         try:
-            try:
-                await http_range_download(
-                    dl.url,
-                    part,
-                    on_progress,
-                    first_byte_timeout=self.settings.download_first_byte_timeout,
-                    transport=self.download_transport,
-                )
-            except DownloadError as exc:
-                if exc.expired:
-                    raise
-                if not exc.transient:
-                    # e.g. server handed us a playlist: remux the HLS stream without transcoding.
-                    self._update(jid, message=f"Direct file unavailable ({exc}); using HLS remux")
-                    await ffmpeg_hls_download(dl.url, part, on_progress, duration=rec.duration)
+            if capture:
+                assert hls_url
+                expected = await hls_duration(hls_url) or rec.duration
+                part = dest.with_name(dest.stem + ".capture.mp4")
+                if _ytdlp_available():
+                    try:
+                        await ytdlp_hls_download(hls_url, part, on_progress)
+                    except DownloadError as exc:
+                        if exc.expired or exc.transient:
+                            raise
+                        self._update(jid, message=f"yt-dlp failed ({exc}); using ffmpeg")
+                        await ffmpeg_hls_download(hls_url, part, on_progress, duration=expected)
                 else:
-                    raise
+                    await ffmpeg_hls_download(hls_url, part, on_progress, duration=expected)
+            else:
+                assert dl is not None
+                try:
+                    await http_range_download(
+                        dl.url,
+                        part,
+                        on_progress,
+                        first_byte_timeout=self.settings.download_first_byte_timeout,
+                        transport=self.download_transport,
+                    )
+                except DownloadError as exc:
+                    if exc.expired:
+                        raise
+                    if not exc.transient:
+                        # e.g. server handed us a playlist: remux the HLS stream without transcoding.
+                        self._update(jid, message=f"Direct file unavailable ({exc}); using HLS remux")
+                        await ffmpeg_hls_download(dl.url, part, on_progress, duration=rec.duration)
+                    else:
+                        raise
         except DownloadError as exc:
             if exc.expired:
                 raise JobFailed(f"Download link rejected ({exc}); will fetch a new one", retry=True) from exc
@@ -383,7 +414,9 @@ class JobManager:
 
         self._update(jid, stage="verifying", progress=None, speed=None, message="Checking file integrity")
         try:
-            info, warnings = await verify_media(part, rec.duration)
+            info, warnings = await verify_media(part, expected)
+            if capture and expected and info.duration < expected * 0.97 - 5:
+                raise DownloadError(f"recording is incomplete ({info.duration:.0f}s of {expected:.0f}s)")
         except DownloadError as exc:
             part.unlink(missing_ok=True)
             raise JobFailed(f"Downloaded file is invalid: {exc}", retry=True) from exc
@@ -412,7 +445,9 @@ class JobManager:
             output_path=str(dest),
             finished_at=time.time(),
             speed=None,
-            message="; ".join(warnings) or f"{info.size / 1e6:.0f} MB, {info.duration / 60:.0f} min",
+            message="; ".join(warnings)
+            or f"{info.size / 1e6:.0f} MB, {info.duration / 60:.0f} min"
+            + (" (recorded from stream)" if capture else ""),
         )
         self.bus.publish("library", {"stream_id": rec.id})
         if p.get("auto_transcribe"):

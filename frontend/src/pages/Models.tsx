@@ -146,6 +146,15 @@ export default function Models() {
                 <input type="checkbox" checked={form.auto_transcribe} onChange={(e) => setForm({ ...form, auto_transcribe: e.target.checked })} />
                 Transcribe automatically after each download
               </label>
+              <label className="flex items-start gap-2 text-chalk-2">
+                <input type="checkbox" className="mt-0.5" checked={form.stream_capture} onChange={(e) => setForm({ ...form, stream_capture: e.target.checked })} />
+                <span>
+                  Record streams when the lecturer disabled downloads
+                  <span className="block text-[13px] text-muted">
+                    Saves the stream you can already watch on TUM-Live (yt-dlp, no re-encoding). For your own studying only: keep the files on this computer and don't share them.
+                  </span>
+                </span>
+              </label>
             </div>
             <label className="flex max-w-xs flex-col gap-1">
               <span className="text-chalk-2">Default video variant</span>
@@ -168,6 +177,7 @@ export default function Models() {
                     "stt.vad": form.vad,
                     auto_transcribe: form.auto_transcribe,
                     "download.variant": form.download_variant,
+                    "download.stream_capture": form.stream_capture,
                   })
                 }
               >

@@ -104,7 +104,8 @@ export interface TranscriptSummary {
   segment_count?: number;
 }
 export interface Transcript extends TranscriptSummary {
-  segments: { idx: number; start: number; end: number; text: string }[];
+  /** words: [start, end, text] - null for old transcripts or edited lines */
+  segments: { idx: number; start: number; end: number; text: string; words: [number, number, string][] | null }[];
   media_available: boolean;
 }
 
@@ -161,6 +162,7 @@ export interface SystemInfo {
     remote_url: string | null;
     auto_transcribe: boolean;
     download_variant: string;
+    stream_capture: boolean;
   };
   paths: Record<string, string>;
   priority_courses: { id: string; label: string }[];
