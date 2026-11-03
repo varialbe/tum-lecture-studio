@@ -433,17 +433,20 @@ function Words({ words, time }: { words: [number, number, string][]; time: numbe
     <>
       {words.map(([start, end, w], i) => {
         const state = time >= end ? "past" : time >= start ? "now" : "next";
+        const lead = w.match(/^\s*/)?.[0] ?? "";
         return (
-          <span
-            key={i}
-            className={clsx(
-              "rounded-[3px] transition-colors duration-100",
-              state === "now" && "bg-accent text-accent-ink",
-              state === "past" && "text-chalk",
-              state === "next" && "text-chalk-2/70",
-            )}
-          >
-            {w}
+          <span key={i}>
+            {lead || (i > 0 ? " " : "")}
+            <span
+              className={clsx(
+                "rounded-[3px] px-[1px] transition-colors duration-100",
+                state === "now" && "bg-accent text-accent-ink",
+                state === "past" && "text-chalk",
+                state === "next" && "text-chalk-2/70",
+              )}
+            >
+              {w.slice(lead.length)}
+            </span>
           </span>
         );
       })}
