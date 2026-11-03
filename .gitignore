@@ -33,3 +33,4 @@ backend/lecture_studio/static/
 Thumbs.db
 .idea/
 .vscode/
+*.tsbuildinfo
