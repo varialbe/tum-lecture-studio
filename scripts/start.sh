@@ -43,5 +43,5 @@ if [[ ! -f lecture_studio/static/index.html ]]; then
   (cd "$ROOT/frontend" && npm ci --no-audit --no-fund && npm run build)
   rm -rf lecture_studio/static && cp -r "$ROOT/frontend/dist" lecture_studio/static
 fi
-echo "TUM Lecture Studio: http://127.0.0.1:8420"
+export TLS_OPEN_BROWSER="${TLS_OPEN_BROWSER:-1}"
 exec .venv/bin/lecture-studio

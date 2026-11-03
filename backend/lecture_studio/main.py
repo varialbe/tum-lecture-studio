@@ -585,13 +585,38 @@ def _ascii(s: str) -> str:
 
 
 def run() -> None:
-    import uvicorn
+    import copy
+    import socket
+    import sys
+    import threading
+    import webbrowser
 
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    import uvicorn
+    from uvicorn.config import LOGGING_CONFIG
+
+    # Log to stdout: Windows PowerShell 5.1 renders every stderr line as a red
+    # "NativeCommandError", which makes a healthy start look like a crash.
+    logging.basicConfig(
+        level=logging.INFO, stream=sys.stdout, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
+    log_config = copy.deepcopy(LOGGING_CONFIG)
+    for handler in log_config["handlers"].values():
+        handler["stream"] = "ext://sys.stdout"
     s = load_settings()
     if s.host not in ("127.0.0.1", "localhost", "::1") and os.environ.get("TLS_IN_DOCKER") != "1":
         log.warning("Binding to %s exposes the app beyond this machine. It has no login of its own!", s.host)
-    uvicorn.run(create_app(s), host=s.host, port=s.port, log_level="info")
+    url = f"http://{'127.0.0.1' if s.host in ('0.0.0.0', '::') else s.host}:{s.port}"
+    with socket.socket() as probe:
+        if probe.connect_ex(("127.0.0.1" if s.host in ("0.0.0.0", "::") else s.host, s.port)) == 0:
+            print(f"Port {s.port} is already in use - TUM Lecture Studio is probably already running: {url}")
+            print("Close the other window (Ctrl+C) or set TLS_PORT to use another port.")
+            if os.environ.get("TLS_OPEN_BROWSER") == "1":
+                webbrowser.open(url)
+            raise SystemExit(1)
+    if os.environ.get("TLS_OPEN_BROWSER") == "1":
+        threading.Timer(2.5, lambda: webbrowser.open(url)).start()
+    print(f"TUM Lecture Studio is running: {url}  (stop with Ctrl+C)", flush=True)
+    uvicorn.run(create_app(s), host=s.host, port=s.port, log_level="info", log_config=log_config)
 
 
 if __name__ == "__main__":
